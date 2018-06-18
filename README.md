@@ -1,53 +1,64 @@
-# TV Land ActiveRecord Associations Lab
-
 ## Objectives
 
-1. Create and modify tables using ActiveRecord migrations.
-2. Build associations between models using Active Record macros.
+1. Create a table using ActiveRecord.
+2. Use Active Record's querying methods.
 
 ## Overview
 
-In this lab, we'll be working with a TV show domain model. We will have a show, network and character model. They will be associated in the following way:
+In this lab, we'll be working in a TV show domain. We have a TV show model, the `Show` class, and a `shows` table that you'll create in your database.
 
-* An actor has many characters and has many shows through characters. 
-* A character belongs to an actor and belongs to a show. 
-* A show has many characters and has many actors through characters. 
+You'll be required not only to write a migration that creates a `shows` table and gives the `Show` class certain attributes, but also to use Active Record's querying methods.
 
-We've given you a few migrations in the `db/migrate` directory to create the networks and shows table, but you'll have to add additional tables and modify these existing tables as per the guidelines below. 
+### Active Record Querying Methods
 
-**Remember to run `rake db:migrate` in the terminal before you run your tests and after you make any new migrations!**
+Active Record makes it easy to ask our database for certain information and datasets by providing a bunch of built-in methods for us. For example, we can request the sum of all of the values of a particular column with the `#sum` method:
+
+```ruby
+<class name>.sum(:<column_name>)
+```
+
+We can query our database based on certain conditions using the `#where` method.
+
+Let's say we have a `Song` class and table and each song has a `number_of_stars` rating attribute. We could query for songs with more than 3 stars like this:
+
+```ruby
+Song.where("number_of_stars > ?", 3)
+```
+
+Let's look at one more example: Let's say we want to query our database for the lowest value in the `number_of_stars` column, i.e., the lowest rating that any song has:
+
+```ruby
+Song.minimum(:number_of_stars)
+```
+
+You'll be writing methods that *rely on Active Record methods like `#minimum`, `#sum`, and `#where`* to get these tests passing.
+
+Use the following resources to help you find the Active Record query methods that will help you pass these tests:
+
+* [Calculations](http://guides.rubyonrails.org/active_record_querying.html#calculations)
+* [Ordering](http://guides.rubyonrails.org/active_record_querying.html#ordering)
+* [Conditions](http://guides.rubyonrails.org/active_record_querying.html#conditions)
 
 ## Instructions
 
-### `spec/actor_spec.rb` and `spec/character_spec.rb`
+### Migration
 
-* Write a migration for the actors table. An actor should have a `first_name` and a `last_name`. 
-* Write a migration for the characters table. A character should have a `name` and a `show_id`––a character will belong to a show. 
-* Associate the `Actor` model with the `Character` and `Show` model. An actor should have many characters and many shows through characters. 
-* Write a method in the `Actor` class, `#full_name`, that returns the first and last name of an actor. 
-* Write a method in the `Actor` class, `#list_roles`, that lists all of the characters that actor has. 
-* Write a migration that adds the column `catchphrase` to your character model.
-* Define a method in the `Character` class, `#say_that_thing_you_say`, using a given character's catchphrase.
+* Run `mkdir db` and then `mkdir db/migrate` to create the `migrate` folder within `db`. Then create a file in the `db/migrate` folder called `001_create_shows.rb`. In this file, write the migration code to create a `shows` table. The table should have `name`, `network`, `day`, and `rating` columns. `name`, `network`, and `day` have a datatype of string, and `rating` has a datatype of integer.
+* Create an `app` folder with a `models` folder within it, and then create a file, `show.rb`, in `app/models`. In this file, you will define a `Show` class that inherits from `ActiveRecord::Base`.
+* Now we need to create a second migration to add another column to our `shows` table. In the `db/migrate` folder, create another file, `002_add_season_to_shows.rb`, and write a migration to add a column, `season`, to the `shows` table. The datatype of this column is string.
 
-### `spec/show_spec.rb`
- 
-* Write a migration for the shows table. A show should have a name and a genre. 
-* Create the neccesary associations between shows, networks, and characters. 
+### Methods
 
-### Active Record 5.x Migrations Versioning
+You'll be defining the following methods:
 
-***NOTE***: As of Active Record 5.x, we can no longer inherit directly from `ActiveRecord::Migration` and must instead specify which version of Active Record / Rails the migration was written for. If we were writing a migration for Active Record 5.1, we would inherit from `ActiveRecord::Migration[5.1]`. Don't worry too much about this until you get to the Rails section. Until then, if you encounter an error like this...
-```
-StandardError: Directly inheriting from ActiveRecord::Migration is not supported. Please specify the Rails release the migration was written for:
+* `highest_rating`: this method should return the highest value in the ratings column. *hint*: if there is a `minimum` Active Record method, might there be a `maximum` method?
+* `most_popular_show`: this method should return the show with the highest rating. *hint*: use the `highest_rating` method as a helper method.
+* `lowest_rating`: returns the lowest value in the ratings column.
+* `least_popular_show`: returns the show with the lowest rating.
+* `ratings_sum`: returns the sum of all of the ratings.
+* `popular_shows`: returns an array of all of the shows that have a rating greater than `5`. *hint*: use the `where` Active Record method.
+* `shows_by_alphabetical_order`: returns an array of all of the shows sorted by alphabetical order according to their names. *hint*: use the `order` Active Record method.
 
-  class CreateDogs < ActiveRecord::Migration[4.2]
-```
-...simply add `[4.2]` to the end of `ActiveRecord::Migration`, exactly as the error message instructs.
+<p data-visibility='hidden'>View <a href='https://learn.co/lessons/activerecord-tvshow' title='Objectives'>Objectives</a> on Learn.co and start learning to code for free.</p>
 
-
-## Resources
-* Rails Guide - [Active Record Associations](http://guides.rubyonrails.org/association_basics.html)
-* Api dock - [Active Record Associations](http://apidock.com/rails/ActiveRecord/Associations)
-* Rails Guide - [Active Record Migrations](http://edgeguides.rubyonrails.org/active_record_migrations.html)
-
-<p data-visibility='hidden'>View <a href='https://learn.co/lessons/activerecord-tvland' title='TV Land ActiveRecord Associations Lab'>TV Land ActiveRecord Associations Lab</a> on Learn.co and start learning to code for free.</p>
+<p class='util--hide'>View <a href='https://learn.co/lessons/activerecord-tvshow'>Advanced Finding Lab</a> on Learn.co and start learning to code for free.</p>
